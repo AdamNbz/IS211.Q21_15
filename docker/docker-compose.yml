@@ -1,0 +1,37 @@
+version: "3.2"
+services:
+  zero1:
+    image: dgraph/dgraph:latest
+    container_name: dgraph_zero1
+    ports:
+      - "5080:5080"
+      - "6080:6080"
+    volumes:
+      - ./dgraph_data/zero1:/dgraph
+    restart: on-failure
+    # Thay đổi IP --my thành IP Tailscale của Máy 1
+    command: dgraph zero --my=100.68.7.23:5080 --replicas 1
+
+  alpha1:
+    image: dgraph/dgraph:latest
+    container_name: dgraph_alpha1
+    ports:
+      - "8080:8080"
+      - "9080:9080"
+      - "7080:7080"
+    volumes:
+      - ./dgraph_data/alpha1:/dgraph
+    restart: on-failure
+    # Cập nhật IP cho --my và --zero theo IP Tailscale
+    command: dgraph alpha --my=100.68.7.23:7080 --zero=100.68.7.23:5080 --bindall=true --security "whitelist=0.0.0.0/0"
+    depends_on:
+      - zero1
+
+  ratel:
+    image: dgraph/ratel:latest
+    container_name: dgraph_ratel
+    ports:
+      - "8000:8000"
+    restart: on-failure
+    depends_on:
+      - alpha1

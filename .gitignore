@@ -1,2 +1,3 @@
 docker/dgraph_data/alpha1/
 docker/dgraph_data/zero1/
+docker/docker-compose.yml

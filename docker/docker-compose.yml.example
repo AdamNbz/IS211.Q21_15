@@ -1,4 +1,3 @@
-version: "3.2"
 services:
   zero1:
     image: dgraph/dgraph:latest
@@ -9,8 +8,8 @@ services:
     volumes:
       - ./dgraph_data/zero1:/dgraph
     restart: on-failure
-    # Thay đổi IP --my thành IP Tailscale của Máy 1
-    command: dgraph zero --my=100.68.7.23:5080 --replicas 1
+    # TODO: Thay YOUR_TAILSCALE_IP bằng IP Tailscale của máy chạy Dgraph Zero.
+    command: dgraph zero --my=YOUR_TAILSCALE_IP:5080 --replicas 1
 
   alpha1:
     image: dgraph/dgraph:latest
@@ -22,13 +21,16 @@ services:
     volumes:
       - ./dgraph_data/alpha1:/dgraph
     restart: on-failure
-    # Cập nhật IP cho --my và --zero theo IP Tailscale
-    command: dgraph alpha --my=100.68.7.23:7080 --zero=100.68.7.23:5080 --bindall=true --security "whitelist=0.0.0.0/0"
+    # TODO: Thay YOUR_TAILSCALE_IP bằng IP Tailscale của máy chạy Dgraph Alpha/Zero.
+    command: dgraph alpha --my=YOUR_TAILSCALE_IP:7080 --zero=YOUR_TAILSCALE_IP:5080 --bindall=true --security "whitelist=0.0.0.0/0"
     depends_on:
       - zero1
 
   ratel:
     image: dgraph/ratel:latest
+    # macOS Apple Silicon: giữ linux/amd64 vì image ratel không khớp host linux/arm64/v8.
+    # Windows/Linux x86_64: có thể xóa dòng platform bên dưới.
+    platform: linux/amd64
     container_name: dgraph_ratel
     ports:
       - "8000:8000"
